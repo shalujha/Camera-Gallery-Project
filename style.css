@@ -107,7 +107,7 @@ width: 2rem;
 }
 .red{
     background-color:#ffa50052;
-   
+ 
 }
 .blue{
     background-color: #a52a2a59;
@@ -126,4 +126,17 @@ width: 2rem;
     top: 0;
     left: 0;
     z-index: 1;
+}
+.gallery-icon{
+    color: white;
+    font-size: 4rem;
+}
+.gallery-cont{
+    position: absolute;
+    bottom: 4rem;
+    right:4rem ;
+    z-index: 2;
+}
+.gallery-cont:hover{
+    cursor: pointer;
 }

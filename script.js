@@ -6,6 +6,8 @@ let filterLayer=document.querySelector(".filter-layer");
 let allFilters=document.querySelectorAll(".filter");
 let capture_btn_cont=document.querySelector(".capture-btn-cont");
 let capture_btn=document.querySelector(".capture-btn");
+let gallery_cont=document.querySelector(".gallery-cont");
+
 let constraints={
     video:true,
     audio:true
@@ -14,7 +16,7 @@ let recorder;
 let recordFlag=false;
 let chunks=[];
 let frames=[]
-let transparentColor;
+let transparentColor="transparent";
 navigator.mediaDevices.getUserMedia(constraints).then(function(stream){
    video.srcObject=stream;
    recorder=new MediaRecorder(stream);
@@ -47,11 +49,22 @@ navigator.mediaDevices.getUserMedia(constraints).then(function(stream){
      console.log(chunks);
      // console.log("length is "+chunks.length);
       let blob=new Blob(chunks,{type:"video/mp4"});
-      let url=URL.createObjectURL(blob);
-      let a=document.createElement("a");
-      a.href=url;
-      a.download="stream.mp4";
-      a.click();
+
+      // add this entry into object stores of indexDB
+      if(db){
+          let videoTransaction=db.transaction("video","readwrite");
+          let videoObjectStore=videoTransaction.objectStore("video");
+          let videoEntry={
+              id:`vid-${shortid()}`,
+              vidBlob:blob
+          }
+          videoObjectStore.add(videoEntry);
+      }
+    //   let url=URL.createObjectURL(blob);
+    //   let a=document.createElement("a");
+    //   a.href=url;
+    //   a.download="stream.mp4";
+    //   a.click();
     //  alert("stopped");
    });
 });
@@ -103,17 +116,26 @@ capture_btn.addEventListener("click",(e)=>{
    canvas.height=video.videoHeight;
    let tool=canvas.getContext('2d');
    tool.fillStyle = transparentColor;
-   console.log("add hua : "+ transparentColor);
+//   console.log("add hua : "+ transparentColor);
    
    tool.drawImage(video, 0, 0, canvas.width, canvas.height);
    tool.fillRect(0, 0, canvas.width, canvas.height);
    let dataURL = canvas.toDataURL();
-   let a=document.createElement("a");
-    a.href=dataURL;
-    a.download="image.jpg";
-    a.click();
 
-
+   if(db){
+    dataURL = canvas.toDataURL();
+    let imageTransaction=db.transaction("image","readwrite");
+    let imageObjectStore=imageTransaction.objectStore("image");
+    let imageEntry={
+        id:`img-${shortid()}`,
+        imgUrl:dataURL
+    }
+    imageObjectStore.add(imageEntry);
+}
+//    let a=document.createElement("a");
+//     a.href=dataURL;
+//     a.download="image.jpg";
+//     a.click();
 });
 
 allFilters.forEach(filter=>{
@@ -121,9 +143,15 @@ filter.addEventListener("click",(e)=>{
     console.log("clicked");
     transparentColor=getComputedStyle(filter).getPropertyValue("background-color");
     console.log("transparentColor : "+ transparentColor);
+    video.className=transparentColor;
     filterLayer.style.backgroundColor=transparentColor;
 })
 });
+
+gallery_cont.addEventListener("click",(e)=>{
+    console.log("gallery cont clicked");
+    location.assign("gallery.html");
+})
 
 
 
