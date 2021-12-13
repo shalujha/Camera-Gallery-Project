@@ -107,8 +107,8 @@ function handleDelete(mediaContainer){
       let currentimageTransaction=db.transaction("image","readwrite");
  let currentimageObjectStore=currentimageTransaction.objectStore("image");
     if(id.slice(0,3)=="vid"){
-        console.log(videoObjectStore);
-        console.log(currentvideoObjectStore);
+//        console.log(videoObjectStore);
+  //      console.log(currentvideoObjectStore);
         currentvideoObjectStore.delete(id);
     }else{
        currentimageObjectStore.delete(id);
